@@ -1,25 +1,35 @@
-const express = require('express');
-const cors = require('cors');
+const express      = require('express');
+const cors         = require('cors');
 const cookieParser = require('cookie-parser');
-const helmet = require('helmet');
-const mongoSanitize = require('express-mongo-sanitize');
-const rateLimit = require('express-rate-limit');
+const helmet       = require('helmet');
+const mongoSanitize= require('express-mongo-sanitize');
+const rateLimit    = require('express-rate-limit');
 
 const errorHandler = require('./middleware/errorHandler');
-const authRoutes = require('./routes/authRoutes');
-const taskRoutes = require('./routes/taskRoutes');
+const authRoutes   = require('./routes/authRoutes');
+const taskRoutes   = require('./routes/taskRoutes');
 
 const app = express();
 
 // ── Security Headers ──────────────────────────────────────────────────────────
-app.use(helmet());
+app.use(helmet({ contentSecurityPolicy: false })); // CSP off so React assets load
 
 // ── NoSQL Injection Prevention ────────────────────────────────────────────────
 app.use(mongoSanitize());
 
-// ── CORS ──────────────────────────────────────────────────────────────────────
+// ── CORS — allow same-origin + local dev ──────────────────────────────────────
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5001',
+  process.env.CLIENT_URL
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: (origin, cb) => {
+    // Allow requests with no origin (mobile, curl) or matched origins
+    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+    cb(new Error('Not allowed by CORS'));
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -27,11 +37,10 @@ app.use(cors({
 
 // ── Rate Limiting ─────────────────────────────────────────────────────────────
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000,
   max: 100,
   message: { success: false, message: 'Too many requests, please try again later.' }
 });
-
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,
@@ -39,7 +48,7 @@ const authLimiter = rateLimit({
 });
 
 app.use('/api/', limiter);
-app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/login',    authLimiter);
 app.use('/api/auth/register', authLimiter);
 
 // ── Body Parsing ──────────────────────────────────────────────────────────────
@@ -47,18 +56,13 @@ app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(cookieParser());
 
-// ── Routes ────────────────────────────────────────────────────────────────────
-app.use('/api/auth', authRoutes);
+// ── API Routes ────────────────────────────────────────────────────────────────
+app.use('/api/auth',  authRoutes);
 app.use('/api/tasks', taskRoutes);
 
 // ── Health Check ──────────────────────────────────────────────────────────────
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
-});
-
-// ── 404 Handler ───────────────────────────────────────────────────────────────
-app.use('*', (req, res) => {
-  res.status(404).json({ success: false, message: 'Route not found' });
 });
 
 // ── Global Error Handler ──────────────────────────────────────────────────────
