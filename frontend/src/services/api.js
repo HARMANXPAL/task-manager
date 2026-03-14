@@ -20,3 +20,5 @@ export const updateTask = (id, data) => api.put(`/tasks/${id}`, data);
 export const deleteTask = (id)    => api.delete(`/tasks/${id}`);
 
 export default api;
+
+export const getStats  = ()     => api.get('/tasks/stats');

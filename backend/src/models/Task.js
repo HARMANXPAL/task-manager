@@ -23,6 +23,18 @@ const taskSchema = new mongoose.Schema(
       },
       default: 'todo'
     },
+    priority: {
+      type: String,
+      enum: {
+        values: ['low', 'medium', 'high'],
+        message: 'Priority must be one of: low, medium, high'
+      },
+      default: 'medium'
+    },
+    dueDate: {
+      type: Date,
+      default: null
+    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
