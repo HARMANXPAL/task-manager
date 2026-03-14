@@ -22,3 +22,5 @@ export const deleteTask = (id)    => api.delete(`/tasks/${id}`);
 export default api;
 
 export const getStats  = ()     => api.get('/tasks/stats');
+export const getActivity = () => api.get('/tasks/activity');
+export const exportCSV   = () => api.get('/tasks/export', { responseType: 'blob' });

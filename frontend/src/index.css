@@ -316,3 +316,74 @@ body {
 }
 .kanban-col .task-card { cursor: grab; }
 .kanban-col .task-card:active { cursor: grabbing; opacity: .8; }
+
+/* ── Dark mode ─────────────────────────────────────────────────────────────── */
+[data-theme="dark"] {
+  --bg:      #0f172a;
+  --surface: #1e293b;
+  --border:  #334155;
+  --text:    #f1f5f9;
+  --muted:   #94a3b8;
+  --shadow:  0 2px 12px rgba(0,0,0,.4);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,.5);
+  --todo-bg: #1e293b; --todo-fg: #94a3b8;
+  --wip-bg:  #1e3a5f; --wip-fg:  #60a5fa;
+  --done-bg: #14532d; --done-fg: #4ade80;
+}
+[data-theme="dark"] .input { background: #0f172a; color: var(--text); }
+[data-theme="dark"] .modal { background: var(--surface); }
+[data-theme="dark"] .auth-card { background: var(--surface); }
+[data-theme="dark"] .task-overdue { border-color: #7f1d1d !important; background: #1c0a0a !important; }
+
+.theme-toggle {
+  background: none; border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 6px 10px; cursor: pointer; font-size: 1rem;
+  transition: background .15s;
+}
+.theme-toggle:hover { background: var(--bg); }
+
+/* ── Skeleton loading ──────────────────────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+.skeleton-line {
+  height: 14px; border-radius: 6px; margin-bottom: 8px;
+  background: linear-gradient(90deg, var(--border) 25%, var(--bg) 50%, var(--border) 75%);
+  background-size: 400px 100%;
+  animation: shimmer 1.4s infinite linear;
+}
+.skeleton-line.sk-sm { height: 11px; }
+.skeleton-line.w-30  { width: 30%; }
+.skeleton-line.w-40  { width: 40%; }
+.skeleton-line.w-60  { width: 60%; }
+.skeleton-line.w-70  { width: 70%; }
+.skeleton-line.w-90  { width: 90%; }
+
+.skeleton-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px 20px 20px 22px;
+  box-shadow: var(--shadow);
+}
+.skeleton-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+.skeleton-btn { width: 52px; height: 28px; border-radius: 6px; background: var(--border); animation: shimmer 1.4s infinite linear; background-size: 400px 100%; }
+
+/* ── Activity log panel ────────────────────────────────────────────────────── */
+.activity-panel {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 18px 20px;
+  margin-bottom: 20px; box-shadow: var(--shadow);
+}
+.activity-title { font-size: 1rem; font-weight: 700; margin-bottom: 14px; }
+.activity-list  { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.activity-item  {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 12px; border-radius: 8px; background: var(--bg);
+  font-size: .85rem;
+}
+.activity-icon  { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+.activity-body  { flex: 1; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.activity-task  { font-weight: 700; color: var(--text); }
+.activity-action{ color: var(--muted); }
+.activity-detail{ color: var(--primary); font-size: .8rem; background: rgba(79,70,229,.1); padding: 1px 6px; border-radius: 4px; }
+.activity-time  { color: var(--muted); font-size: .75rem; flex-shrink: 0; white-space: nowrap; }
